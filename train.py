@@ -37,7 +37,7 @@ def train(model, dataset, optimizer, epochs):
         
         # save current loss and accuracy
         train_history["valid_loss"].append(loss_val.item())
-        train_history["valid_accuracy"].append(acc_val)
+        train_history["valid_accuracy"].append(acc_val.item())
    
     return train_history
     
@@ -51,7 +51,5 @@ def test(model, dataset):
     
     loss_test = loss(output[idx_test], labels[idx_test])
     acc_test = accuracy(output[idx_test], labels[idx_test])
-    
-    print("accuracy= {:.4f}".format(acc_test.item()))
-    return loss_test.item()
+    return acc_test
     

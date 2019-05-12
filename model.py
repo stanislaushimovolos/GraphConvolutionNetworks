@@ -5,7 +5,8 @@ import torch.nn.functional as F
 
    
 class Gcn(nn.Module):
-    def __init__(self, nfeatures, hidden_size, nclasses, nhidden_layers=0, dropout=0.0):
+    def __init__(self, nfeatures, nclasses, hidden_size=16, nhidden_layers=0, dropout=0.0,
+                                                             use_skip_connection=False):
         super().__init__()
         
         self.dropout = dropout
@@ -14,9 +15,11 @@ class Gcn(nn.Module):
         self.nfeatures = nfeatures
         self.nhidden_layers = nhidden_layers
          
-        self.input_layer = GraphConvolution(nfeatures, hidden_size)
-        self.hidden_layers = self.create_conv_sequence(self.nhidden_layers, self.hidden_size, self.dropout)
-        self.output_layer =  GraphConvolution(hidden_size, nclasses)
+        self.input_layer = GraphConvolution(nfeatures, hidden_size, self.dropout)
+        
+        # do not use dropout in hidden layers
+        self.hidden_layers = self.create_conv_sequence(self.nhidden_layers, self.hidden_size, 0)
+        self.output_layer =  GraphConvolution(hidden_size, nclasses, self.dropout)
     
     @staticmethod
     def create_conv_sequence(num_of_layers, hidden_size, dropout):
@@ -33,11 +36,13 @@ class Gcn(nn.Module):
         return output
     
 class GraphConvolution(nn.Module):
-    def __init__(self, in_features, out_features, dropout=0, use_activation=True, bias=True):
+    def __init__(self, in_features, out_features, dropout=0, use_activation=True, bias=False,
+                                                                   use_skip_connection=False):
         super().__init__()
         
         self.dropout = dropout
         self.use_activation = use_activation
+        self.use_skip_connection = use_skip_connection
         self.in_features = in_features
         self.out_features = out_features
         self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features))
@@ -50,7 +55,7 @@ class GraphConvolution(nn.Module):
         self.init_parameters()
     
     def init_parameters(self):
-        # Pytorch initialization (see docs)
+        # PyTorch initialization (see docs)
         stdv = 1. / math.sqrt(self.weight.size(1))
         self.weight.data.uniform_(-stdv, stdv)
         if self.bias is not None:
@@ -66,9 +71,12 @@ class GraphConvolution(nn.Module):
         if self.bias is not None:
             x =  x + self.bias
             
-        # Apply activatian
+        # Apply activation
         if self.use_activation:
-            x = F.leaky_relu(x)
+            x = F.relu(x)
+        
+        if self.use_skip_connection:
+            x+=node_features
         
         x = F.dropout(x, self.dropout, training=self.training)
         return [x, adj_matrix]  
