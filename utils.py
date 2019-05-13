@@ -2,6 +2,10 @@ import numpy as np
 import scipy.sparse as sp
 import torch
 
+"""
+Original script (reader) is stored here:
+https://github.com/tkipf/pygcn/blob/master/pygcn/utils.py
+"""
 
 def encode_onehot(labels):
     classes = set(labels)
@@ -37,9 +41,9 @@ def load_cora(path="cora/", dataset="cora"):
     features = normalize(features)
     adj = normalize(adj + sp.eye(adj.shape[0]))
 
-    idx_train = range(150)
+    idx_train = range(0, 1000)
     idx_val = range(200, 500)
-    idx_test = range(500, 1500)
+    idx_test = range(0, 1000)
 
     features = torch.FloatTensor(np.array(features.todense()))
     labels = torch.LongTensor(np.where(labels)[1])

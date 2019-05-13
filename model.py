@@ -85,3 +85,4 @@ class GraphConvolution(nn.Module):
 
         x = F.dropout(x, self.dropout, training=self.training)
         return [x, adj_matrix]
+    
