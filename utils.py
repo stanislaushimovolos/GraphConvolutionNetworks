@@ -41,9 +41,9 @@ def load_cora(path="cora/", dataset="cora"):
     features = normalize(features)
     adj = normalize(adj + sp.eye(adj.shape[0]))
 
-    idx_train = range(0, 1000)
+    idx_train = range(0, 500)
     idx_val = range(200, 500)
-    idx_test = range(0, 1000)
+    idx_test = range(500, 1500)
 
     features = torch.FloatTensor(np.array(features.todense()))
     labels = torch.LongTensor(np.where(labels)[1])
