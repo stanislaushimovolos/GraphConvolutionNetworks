@@ -1,4 +1,4 @@
-Graph Convolutional Networks in PyTorch
+Graph Convolutional Networks
 ====
 
-PyTorch implementation of Graph Convolutional Networks (GCNs) for semi-supervised classification.
+PyTorch implementation of Graph Convolutional Networks.
